@@ -208,3 +208,94 @@ Flux<User> createFluxFromMultipleMono(Mono<User> mono1, Mono<User> mono2) {
 ```
 
 ![concat](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/doc-files/marbles/concatVarSources.svg)
+
+## Request
+
+![request](https://tech.io/servlet/fileservlet?id=72035421157113)
+
+### 7-1 Create a StepVerifier that initially requests all values and expect 4 values to be received
+
+```java
+ StepVerifier requestAllExpectFour(Flux<User> flux) {
+  return StepVerifier.create(flux)
+            .expectNextCount(4) // Expect to received count elements, starting from the previous expectation or onSubscribe.
+            .expectComplete();
+ }
+```
+
+### 7-2 Create a StepVerifier that initially requests 1 value and expects User.SKYLER then requests another value and expects User.JESSE then stops verifying by cancelling the source
+
+```java
+StepVerifier requestOneExpectSkylerThenRequestOneExpectJesse(Flux<User> flux) {
+    return StepVerifier.create(flux, 1)   // 두번째 파라미터 n - the amount of items to request
+                      .expectNext(User.SKYLER)
+                      .thenRequest(1)
+                      .expectNext(User.JESSE)
+                      .thenCancel();  // Cancel the underlying subscription. This happens sequentially after the previous step.
+}
+```
+
+### 7-3 Return a Flux with all users stored in the repository that prints automatically logs for all Reactive Streams signals
+
+```java
+// ReactiveRepository<User> repository = new ReactiveUserRepository();
+
+/**
+@findAll
+reactor.core.publisher.Flux<T> findAll()
+Returns all instances of the type.
+
+Returns:
+Flux emitting all entities.
+*/
+Flux<User> fluxWithLog() {
+  return repository
+    .findAll()
+    .log();
+}
+```
+
+![log](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/doc-files/marbles/logForFlux.svg)
+
+#### 7-3 Result
+
+```text
+2022-02-06 14:33:38 [main] INFO  reactor.Flux.Zip.1 - onSubscribe(FluxZip.ZipCoordinator)
+2022-02-06 14:33:38 [main] INFO  reactor.Flux.Zip.1 - request(1)
+2022-02-06 14:33:38 [parallel-1] INFO  reactor.Flux.Zip.1 - onNext(Person{username='swhite', firstname='Skyler', lastname='White'})
+2022-02-06 14:33:38 [parallel-1] INFO  reactor.Flux.Zip.1 - request(1)
+2022-02-06 14:33:38 [parallel-1] INFO  reactor.Flux.Zip.1 - onNext(Person{username='jpinkman', firstname='Jesse', lastname='Pinkman'})
+2022-02-06 14:33:38 [parallel-1] INFO  reactor.Flux.Zip.1 - request(2)
+2022-02-06 14:33:38 [parallel-1] INFO  reactor.Flux.Zip.1 - onNext(Person{username='wwhite', firstname='Walter', lastname='White'})
+2022-02-06 14:33:38 [parallel-1] INFO  reactor.Flux.Zip.1 - onNext(Person{username='sgoodman', firstname='Saul', lastname='Goodman'})
+2022-02-06 14:33:38 [parallel-1] INFO  reactor.Flux.Zip.1 - onComplete()
+```
+
+### 7-4 Return a Flux with all users stored in the repository that prints "Starring:" on subscribe, "firstname lastname" for all values and "The end!" on complete
+
+```java
+// ReactiveRepository<User> repository = new ReactiveUserRepository();
+Flux<User> fluxWithDoOnPrintln() {
+  return repository.findAll()
+                  .doOnSubscribe(subscription -> System.out.println("Starring:"))
+                  .doOnNext(p -> System.out.println(p.getFirstname() + " " + p.getLastname()))
+                  .doOnComplete(() -> System.out.println("The end!"));
+}
+```
+
+![doOnSubscribe](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/doc-files/marbles/doOnSubscribe.svg)
+
+![doOnNext](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/doc-files/marbles/doOnNextForFlux.svg)
+
+![doOnComplete](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/doc-files/marbles/doOnComplete.svg)
+
+#### 7-4 Result
+
+```text
+Starring:
+Skyler White
+Jesse Pinkman
+Walter White
+Saul Goodman
+The end!
+```

@@ -299,3 +299,52 @@ Walter White
 Saul Goodman
 The end!
 ```
+
+## 8 Error
+
+### 8-1 Return a Mono\<User\> containing User.SAUL when an error occurs in the input Mono, else do not change the input Mono
+
+```java
+Mono<User> betterCallSaulForBogusMono(Mono<User> mono) {
+  return mono.onErrorReturn(User.SAUL);
+}
+```
+
+![onErrorReturn](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/doc-files/marbles/onErrorReturnForMono.svg)
+
+### 8-2 Return a Flux\<User\> containing User.SAUL and User.JESSE when an error occurs in the input Flux, else do not change the input Flux
+
+```java
+Flux<User> betterCallSaulAndJesseForBogusFlux(Flux<User> flux) {
+  return flux.onErrorResume(e -> Flux.just(User.SAUL, User.JESSE));
+}
+```
+
+![onErrorResume](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/doc-files/marbles/onErrorResumeForFlux.svg)
+
+### 8-3 Implement a method that capitalizes each user of the incoming flux using the #capitalizeUser method and emits an error containing a GetOutOfHereException error
+
+#### Exceptions.propagate
+
+- Checked Exception ( RuntimeException 을 상속받지 않은 예외 ) 를 RuntimeException으로 바꾸어주는 함수.
+
+```java
+Flux<User> capitalizeMany(Flux<User> flux) {
+  return flux.map(user -> {
+        try{
+            return capitalizeUser(user);
+        } catch (GetOutOfHereException e) {
+            throw Exceptions.propagate(e);
+        }
+    });
+}
+User capitalizeUser(User user) throws GetOutOfHereException {
+  if (user.equals(User.SAUL)) {
+    throw new GetOutOfHereException();
+  }
+  return new User(user.getUsername(), user.getFirstname(), user.getLastname());
+}
+protected final class GetOutOfHereException extends Exception {
+    private static final long serialVersionUID = 0L;
+}
+```

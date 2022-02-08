@@ -375,3 +375,62 @@ Flux<User> fromFlowableToFlux(Flowable<User> flowable) {
 }
 ```
 
+### 9-3 Adapt Flux to RxJava Observable
+
+```java
+Observable<User> fromFluxToObservable(Flux<User> flux) {
+  return Observable.fromPublisher(flux);
+}
+```
+
+### 9-4 Adapt RxJava Observable to Flux
+
+[(stack overflow) Observable to Flux Conversion](https://stackoverflow.com/questions/50887399/observable-to-flux-conversion)
+
+```java
+// import io.reactivex.rxjava3.core.BackpressureStrategy;
+
+Flux<User> fromObservableToFlux(Observable<User> observable) {
+  return Flux.from(observable.toFlowable(BackpressureStrategy.BUFFER));
+}
+```
+
+### 9-5 Adapt Mono to RxJava Single
+
+```java
+Single<User> fromMonoToSingle(Mono<User> mono) {
+  return Single.fromPublisher(mono);
+}
+```
+
+### 9-6 Adapt RxJava Single to Mono
+
+```java
+Mono<User> fromSingleToMono(Single<User> single) {
+  return Mono.from(single.toFlowable());
+}
+```
+
+### 9-7 Adapt Mono to Java 8+ CompletableFuture
+
+#### toFuture()
+
+- Transform this Mono into a **CompletableFuture** completing on onNext or onComplete and failing on onError.
+
+```java
+ompletableFuture<User> fromMonoToCompletableFuture(Mono<User> mono) {
+  return mono.toFuture();
+}
+```
+
+### 9-8 Adapt Java 8+ CompletableFuture to Mono
+
+#### fromFuture(CompletableFuture<? extends T> future)
+
+- Create a Mono, producing its value using the provided CompletableFuture.
+
+```java
+Mono<User> fromCompletableFutureToMono(CompletableFuture<User> future) {
+  return Mono.fromFuture(future);
+}
+```

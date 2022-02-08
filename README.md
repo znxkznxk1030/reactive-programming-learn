@@ -348,3 +348,30 @@ protected final class GetOutOfHereException extends Exception {
     private static final long serialVersionUID = 0L;
 }
 ```
+
+## 9 Adapt
+
+### 9-1 Adapt Flux to RxJava Flowable
+
+#### Flowable\<T\>#fromPublisher(@NonNull Publisher<? extends T> publisher)
+
+- Converts an arbitrary Reactive Streams Publisher into a Flowable if not already a Flowable.
+
+```java
+Flowable<User> fromFluxToFlowable(Flux<User> flux) {
+  return Flowable.fromPublisher(flux);
+}
+```
+
+### 9-2 Adapt RxJava Flowable to Flux
+
+#### Flux\<T\>#from(Publisher<? extends T> source)
+
+- Decorate the specified Publisher with the Flux API.
+
+```java
+Flux<User> fromFlowableToFlux(Flowable<User> flowable) {
+  return Flux.from(flowable);
+}
+```
+

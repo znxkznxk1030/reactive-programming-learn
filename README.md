@@ -511,4 +511,12 @@ Mono<User> emptyToSkyler(Mono<User> mono) {
 
 ### 10-7 Convert the input Flux\<User\> to a Mono\<List\<User\>\> containing list of collected flux values
 
+```java
+Mono<List<User>> fluxCollection(Flux<User> flux) {
+  return flux.collectList();
+}
+```
 
+#### Mono\<List\<T\>\> collectList()
+
+![collectList](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/doc-files/marbles/collectList.svg)

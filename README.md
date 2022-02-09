@@ -434,3 +434,81 @@ Mono<User> fromCompletableFutureToMono(CompletableFuture<User> future) {
   return Mono.fromFuture(future);
 }
 ```
+
+## 10 Other Operations
+
+### 10-1 Create a Flux of user from Flux of username, firstname and lastname.
+
+```java
+Flux<User> userFluxFromStringFlux(Flux<String> usernameFlux, Flux<String> firstnameFlux, Flux<String> lastnameFlux) {
+  return Flux.zip(usernameFlux, firstnameFlux, lastnameFlux).flatMap(zippedFlux -> {
+        return Flux.just(new User(zippedFlux.getT1(), zippedFlux.getT2(), zippedFlux.getT3()));
+    });
+}
+```
+
+![zip](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/doc-files/marbles/zipIterableSourcesForFlux.svg)
+
+### 10-2 Return the mono which returns its value faster
+
+```java
+Mono<User> useFastestMono(Mono<User> mono1, Mono<User> mono2) {
+  return Mono.first(mono1, mono2);
+}
+```
+
+- first는 deprecated -> firstWithSignal 사용 권고
+
+![first#Mono](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/doc-files/marbles/firstWithSignalForMono.svg)
+
+### 10-3 Return the flux which returns the first value faster
+
+```java
+Flux<User> useFastestFlux(Flux<User> flux1, Flux<User> flux2) {
+  return Flux.first(flux1, flux2);
+}
+```
+
+- first는 deprecated -> firstWithSignal 사용 권고
+
+![first#Flux](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/doc-files/marbles/firstWithSignalForFlux.svg)
+
+### 10-4 Convert the input Flux\<User\> to a Mono\<Void\> that represents the complete signal of the flux
+
+#### Mono\<T\> ignoreElements()
+
+![ignoreElements](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/doc-files/marbles/ignoreElementsForFlux.svg)
+
+#### Mono\<Void\> then()
+
+```java
+Mono<Void> fluxCompletion(Flux<User> flux) {
+  return flux.ignoreElements().then();
+}
+```
+
+![then](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/doc-files/marbles/thenForFlux.svg)
+
+### 10-5 Return a valid Mono of user for null input and non null input user (hint: Reactive Streams do not accept null values)
+
+```java
+Mono<User> nullAwareUserToMono(User user) {
+  return Mono.justOrEmpty(user);
+}
+```
+
+![justOrEmpty](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/doc-files/marbles/justOrEmpty.svg)
+
+### 10-6 Return the same mono passed as input parameter, expect that it will emit User.SKYLER when empty
+
+```java
+Mono<User> emptyToSkyler(Mono<User> mono) {
+  return mono.switchIfEmpty(Mono.just(User.SKYLER));
+}
+```
+
+![switchIfEmpty](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/doc-files/marbles/switchIfEmptyForMono.svg)
+
+### 10-7 Convert the input Flux\<User\> to a Mono\<List\<User\>\> containing list of collected flux values
+
+

@@ -520,3 +520,33 @@ Mono<List<User>> fluxCollection(Flux<User> flux) {
 #### Mono\<List\<T\>\> collectList()
 
 ![collectList](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/doc-files/marbles/collectList.svg)
+
+## 11 Reactive to Blocking
+
+### 11-1 Return the user contained in that Mono
+
+```java
+User monoToValue(Mono<User> mono) {
+  return mono.block();
+}
+```
+
+#### T block()
+
+- Subscribe to this Mono and block indefinitely until a next signal is received. Returns that value, or null if the Mono completes empty. In case the Mono errors, the original exception is thrown (wrapped in a RuntimeException if it was a checked exception).
+  
+![block](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/doc-files/marbles/block.svg)
+
+### 11-2 Return the users contained in that Flux
+
+```java
+Iterable<User> fluxToValues(Flux<User> flux) {
+  return flux.toIterable();
+}
+```
+
+#### Iterable\<T\> toIterable()
+
+- Transform this Flux into a lazy Iterable blocking on Iterator.next() calls.
+
+![toIterable](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/doc-files/marbles/toIterable.svg)

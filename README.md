@@ -550,3 +550,28 @@ Iterable<User> fluxToValues(Flux<User> flux) {
 - Transform this Flux into a lazy Iterable blocking on Iterator.next() calls.
 
 ![toIterable](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/doc-files/marbles/toIterable.svg)
+
+## 12 Blocking to Reactive
+
+### 12-1 Create a Flux for reading all users from the blocking repository deferred until the flux is subscribed, and run it with an elastic scheduler
+
+```java
+Flux<User> blockingRepositoryToFlux(BlockingRepository<User> repository) {
+  return Flux.defer(() -> Flux.fromIterable(repository.findAll())).subscribeOn(Schedulers.boundedElastic());
+```
+
+#### \<T\> Flux\<T\> defer(Supplier\<? extends Publisher\<T\>\> supplier)
+
+![defer](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/doc-files/marbles/deferForFlux.svg)
+
+#### Flux\<T\> subscribeOn(Scheduler scheduler)
+
+![subscribeOn](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/doc-files/marbles/subscribeOnForFlux.svg)
+
+[Schedulers#boundedElastic](https://projectreactor.io/docs/core/release/api/reactor/core/scheduler/Schedulers.html#boundedElastic--)
+
+### 12-2 Insert users contained in the Flux parameter in the blocking repository using an elastic scheduler and return a Mono<Void> that signal the end of the operation
+
+```java
+
+```

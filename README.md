@@ -575,7 +575,9 @@ Flux<User> blockingRepositoryToFlux(BlockingRepository<User> repository) {
 ### 12-2 Insert users contained in the Flux parameter in the blocking repository using an elastic scheduler and return a Mono\<Void\> that signal the end of the operation
 
 ```java
-
+Mono<Void> fluxToBlockingRepository(Flux<User> flux, BlockingRepository<User> repository) {
+  return flux.publishOn(Schedulers.boundedElastic()).doOnNext(user -> repository.save(user)).then();
+}
 ```
 
 #### Flux\<T\> publishOn(Scheduler scheduler)

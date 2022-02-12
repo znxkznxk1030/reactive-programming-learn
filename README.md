@@ -481,6 +481,8 @@ Flux<User> useFastestFlux(Flux<User> flux1, Flux<User> flux2) {
 
 #### Mono\<Void\> then()
 
+- Return a Mono\<Void\> that completes when this Flux completes. This will actively ignore the sequence and only replay completion or error signals.
+
 ```java
 Mono<Void> fluxCompletion(Flux<User> flux) {
   return flux.ignoreElements().then();
@@ -570,8 +572,12 @@ Flux<User> blockingRepositoryToFlux(BlockingRepository<User> repository) {
 
 [Schedulers#boundedElastic](https://projectreactor.io/docs/core/release/api/reactor/core/scheduler/Schedulers.html#boundedElastic--)
 
-### 12-2 Insert users contained in the Flux parameter in the blocking repository using an elastic scheduler and return a Mono<Void> that signal the end of the operation
+### 12-2 Insert users contained in the Flux parameter in the blocking repository using an elastic scheduler and return a Mono\<Void\> that signal the end of the operation
 
 ```java
 
 ```
+
+#### Flux\<T\> publishOn(Scheduler scheduler)
+
+![publishOn](https://projectreactor.io/docs/core/release/api/reactor/core/publisher/doc-files/marbles/publishOnForFlux.svg)
